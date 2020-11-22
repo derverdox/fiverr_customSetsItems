@@ -1,0 +1,8 @@
+name: CustomItemSets
+main: de.verdox.csi.Core
+version: 1.0
+api-version: "1.8"
+commands:
+  csi:
+    description: Main Plugin Command
+    usage: /<command> give <itemName>
