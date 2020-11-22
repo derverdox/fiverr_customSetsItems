@@ -14,8 +14,15 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import java.util.List;
 
 public class IceKingSet extends ItemSet {
+
+    private float walkSpeedMultiplier;
+
     public IceKingSet(Configuration config, List<CustomItem> customItems) {
         super(config, customItems);
+        if(!config.getConfig().isSet(configPath()+".walkSpeedMultiplier"))
+            config.getConfig().set(configPath()+".walkSpeedMultiplier",1.4f);
+        config.save();
+        this.walkSpeedMultiplier = (float) config.getConfig().getDouble(configPath()+".walkSpeedMultiplier");
     }
 
     @Override
@@ -31,17 +38,21 @@ public class IceKingSet extends ItemSet {
     @Override
     public void onMove(PlayerMoveEvent e) {
         Location from = e.getFrom();
-        System.out.println(from.getBlock().getType());
         if(!from.add(0,-1,0).getBlock().getType().equals(Material.ICE)){
             e.getPlayer().setWalkSpeed(MinecraftConstants.defaultPlayerWalkSpeed);
             return;
         }
 
-        e.getPlayer().setWalkSpeed(MinecraftConstants.defaultPlayerWalkSpeed*1.3f);
+        e.getPlayer().setWalkSpeed(MinecraftConstants.defaultPlayerWalkSpeed*walkSpeedMultiplier);
     }
 
     @Override
     public void onDamage(EntityDamageEvent e) {
+
+    }
+
+    @Override
+    public void onDamageByEntity(EntityDamageByEntityEvent e) {
 
     }
 
@@ -52,6 +63,6 @@ public class IceKingSet extends ItemSet {
 
     @Override
     public String identifier() {
-        return null;
+        return "IceKing_Set";
     }
 }

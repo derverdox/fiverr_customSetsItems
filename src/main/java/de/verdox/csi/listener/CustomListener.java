@@ -7,15 +7,15 @@ import de.verdox.vcore.events.PlayerSessionCreateEvent;
 import de.verdox.vcore.events.armorequipevent.ArmorEquipEvent;
 import de.verdox.vcore.playersession.PlayerSession;
 import de.verdox.vcore.playersession.SessionManager;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
 public class CustomListener implements Listener {
@@ -37,8 +37,12 @@ public class CustomListener implements Listener {
 
     @EventHandler
     public void onHit(ProjectileHitEvent e){
+        if(!(e.getEntity() instanceof Player))
+            return;
         Player player = (Player) e.getEntity().getShooter();
         ItemStack bow = player.getItemInHand();
+        if(!bow.getType().equals(Material.BOW))
+            return;
 
         CustomBow customBow = (CustomBow) CustomItem.findItem(bow);
         if(customBow == null)
@@ -49,6 +53,8 @@ public class CustomListener implements Listener {
     @EventHandler
     public void onLaunch(ProjectileLaunchEvent e){
         Player player = (Player) e.getEntity().getShooter();
+        if(player == null)
+            return;
         ItemStack bow = player.getItemInHand();
 
         CustomBow customBow = (CustomBow) CustomItem.findItem(bow);
@@ -195,11 +201,16 @@ public class CustomListener implements Listener {
 
     @EventHandler
     public void onAttack(EntityDamageByEntityEvent e){
-        if(!(e.getDamager() instanceof Player))
-            return;
-        Player attacker = (Player) e.getDamager();
-        CSIPlayerData csiPlayerData = (CSIPlayerData) SessionManager.getInstance().getSession(attacker).getData(CSIPlayerData.identifier);
-        csiPlayerData.getEquippedSets().forEach(set -> set.onAttack(e));
+        if(e.getEntity() instanceof Player){
+            Player attacker = (Player) e.getEntity();
+            CSIPlayerData csiPlayerData = (CSIPlayerData) SessionManager.getInstance().getSession(attacker).getData(CSIPlayerData.identifier);
+            csiPlayerData.getEquippedSets().forEach(set -> set.onDamageByEntity(e));
+        }
+        if(e.getDamager() instanceof Player){
+            Player attacker = (Player) e.getDamager();
+            CSIPlayerData csiPlayerData = (CSIPlayerData) SessionManager.getInstance().getSession(attacker).getData(CSIPlayerData.identifier);
+            csiPlayerData.getEquippedSets().forEach(set -> set.onAttack(e));
+        }
     }
 
     private boolean isSetComplete(ItemSet itemSet, Player player, CustomItem newItem){

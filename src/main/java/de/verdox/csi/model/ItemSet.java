@@ -17,7 +17,6 @@ public abstract class ItemSet {
     public ItemSet(Configuration config, List<CustomItem> customItems){
         this.customItems = customItems;
         cache.add(this);
-
     }
 
     protected String configPath(){return "CustomSets."+identifier();}
@@ -28,6 +27,7 @@ public abstract class ItemSet {
     public abstract void onUnEquipFullSet(Player player);
     public abstract void onMove(PlayerMoveEvent e);
     public abstract void onDamage(EntityDamageEvent e);
+    public abstract void onDamageByEntity(EntityDamageByEntityEvent e);
     public abstract void onAttack(EntityDamageByEntityEvent e);
     public abstract String identifier();
 }

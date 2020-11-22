@@ -3,10 +3,12 @@ package de.verdox.csi.model;
 import de.verdox.vcore.files.Configuration;
 import de.verdox.vcore.nbtapi.NBTItem;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class CustomItem {
     public static String IDENTIFIER = "CSI_Custom_Item";
@@ -26,7 +28,13 @@ public abstract class CustomItem {
     public ItemStack getItemStack(){
         NBTItem nbtItem = new NBTItem(stack);
         nbtItem.setString(IDENTIFIER,identifier());
-        return nbtItem.getItem();
+        ItemStack stack = nbtItem.getItem();
+        if(enchantments() != null){
+            enchantments().forEach((integer, enchantment) -> {
+                stack.addUnsafeEnchantment(enchantment,integer);
+            });
+        }
+        return stack;
     }
 
     public static CustomItem findItem(ItemStack stack){
@@ -51,4 +59,5 @@ public abstract class CustomItem {
     public abstract boolean isItemEquipped(Player player);
     protected abstract ItemStack customItem();
     public abstract String identifier();
+    protected abstract Map<Integer,Enchantment> enchantments();
 }

@@ -68,7 +68,7 @@ public class CSIPlayerData extends PlayerData {
                     .filter(itemSet -> itemSet.getCustomItems().contains(customItem))
                     .forEach(itemSet -> {
                         if(isSetComplete(itemSet,player,customItem)) {
-                            itemSet.onEquipFullSet(player);
+                            Bukkit.getScheduler().runTask(Core.core,() -> { itemSet.onEquipFullSet(player); });
                             addSet(itemSet);
                         }
                     });
@@ -85,7 +85,7 @@ public class CSIPlayerData extends PlayerData {
                     .filter(itemSet -> itemSet.getCustomItems().contains(customItem))
                     .forEach(itemSet -> {
                         if(isSetComplete(itemSet,player,customItem)){
-                            itemSet.onUnEquipFullSet(player);
+                            Bukkit.getScheduler().runTask(Core.core,() -> { itemSet.onUnEquipFullSet(player); });
                             removeSet(itemSet);
                         }
                     });

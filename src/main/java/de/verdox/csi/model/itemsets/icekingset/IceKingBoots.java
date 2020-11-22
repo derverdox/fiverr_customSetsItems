@@ -1,12 +1,17 @@
-package de.verdox.csi.model.customarmor;
+package de.verdox.csi.model.itemsets.icekingset;
 
+import com.sk89q.worldedit.bukkit.fastutil.Hash;
 import de.verdox.csi.Core;
 import de.verdox.csi.model.CustomArmor;
 import de.verdox.vcore.files.Configuration;
 import de.verdox.vcore.utils.ItemUtil;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class IceKingBoots extends CustomArmor {
     public IceKingBoots(Configuration config) {
@@ -26,11 +31,20 @@ public class IceKingBoots extends CustomArmor {
 
     @Override
     protected ItemStack customItem() {
-        return ItemUtil.createStack(Core.core, Material.DIAMOND_BOOTS.name(), 1,(short) 0,"&bBoots of the Ice King","&cVery powerful boots&7!");
+        ItemStack stack = ItemUtil.createStack(Core.core, Material.DIAMOND_BOOTS.name(), 1,(short) 0,"&bBoots of the Ice King","&cVery powerful boots&7!");
+        return stack;
     }
 
     @Override
     public String identifier() {
         return "IceKing_Boots";
+    }
+
+    @Override
+    protected Map<Integer, Enchantment> enchantments() {
+        Map<Integer,Enchantment> enchantments = new HashMap<>();
+        enchantments.put(7,Enchantment.PROTECTION_ENVIRONMENTAL);
+        enchantments.put(6,Enchantment.DURABILITY);
+        return enchantments;
     }
 }

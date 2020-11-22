@@ -1,17 +1,13 @@
-package de.verdox.csi.model.custombows;
+package de.verdox.csi.model.itemsets.icekingset;
 
-import com.sk89q.worldedit.bukkit.fastutil.Hash;
 import de.verdox.csi.Core;
 import de.verdox.csi.model.CustomBow;
-import de.verdox.csi.model.itemsets.IceKingSet;
-import de.verdox.csi.model.playersession.CSIPlayerData;
 import de.verdox.vcore.files.Configuration;
-import de.verdox.vcore.playersession.SessionManager;
 import de.verdox.vcore.utils.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
-import org.bukkit.entity.Arrow;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -20,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class IceKingBow extends CustomBow {
     private HashMap<Projectile, BukkitTask> shot = new HashMap<>();
@@ -63,11 +60,15 @@ public class IceKingBow extends CustomBow {
     @Override
     protected ItemStack customItem() {
         return ItemUtil.createStack(Core.core, Material.BOW.name(), 1,(short) 0,"&bIce King Bow","&cVery powerful bow&7!");
-
     }
 
     @Override
     public String identifier() {
         return "IceKing_Bow";
+    }
+
+    @Override
+    protected Map<Integer, Enchantment> enchantments() {
+        return null;
     }
 }
