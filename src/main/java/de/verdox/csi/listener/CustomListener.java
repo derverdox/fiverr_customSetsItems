@@ -7,16 +7,20 @@ import de.verdox.vcore.events.PlayerSessionCreateEvent;
 import de.verdox.vcore.events.armorequipevent.ArmorEquipEvent;
 import de.verdox.vcore.playersession.PlayerSession;
 import de.verdox.vcore.playersession.SessionManager;
+import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 public class CustomListener implements Listener {
 
@@ -37,7 +41,7 @@ public class CustomListener implements Listener {
 
     @EventHandler
     public void onHit(ProjectileHitEvent e){
-        if(!(e.getEntity() instanceof Player))
+        if(!(e.getEntity().getShooter() instanceof Player))
             return;
         Player player = (Player) e.getEntity().getShooter();
         ItemStack bow = player.getItemInHand();
@@ -48,6 +52,70 @@ public class CustomListener implements Listener {
         if(customBow == null)
             return;
         customBow.onHit(e);
+    }
+
+    @EventHandler
+    public void onHitCustomArrow(ProjectileHitEvent e){
+        Projectile projectile = e.getEntity();
+        if(!(projectile instanceof Arrow))
+            return;
+        Arrow arrow = (Arrow) projectile;
+        CustomArrow customArrow = CustomArrow.findByArrow(arrow);
+        if(customArrow == null)
+            return;
+        customArrow.callback();
+        customArrow.stopParticles();
+    }
+
+    @EventHandler
+    public void onBowDamage(EntityDamageByEntityEvent e){
+        if(!(e.getDamager() instanceof Arrow))
+            return;
+        Arrow arrow = (Arrow) e.getDamager();
+        if(arrow == null)
+            return;
+        CustomArrow customArrow = CustomArrow.findByArrow(arrow);
+        double damage = customArrow.getDamage();
+        if(damage != 0){
+            e.setDamage(damage);
+        }
+        if(customArrow.getPotionEffects() != null ){
+            if(!(e.getEntity() instanceof LivingEntity))
+                return;
+            LivingEntity livingEntity = (LivingEntity) e.getEntity();
+            for (PotionEffect potionEffect : customArrow.getPotionEffects()) {
+                livingEntity.addPotionEffect(potionEffect);
+            }
+        }
+        CustomBow customBow = customArrow.getCustomBow();
+        if(customBow == null)
+            return;
+        customBow.onCustomArrowHit(e);
+    }
+
+    @EventHandler
+    public void interact(PlayerInteractEvent e){
+        Player player = e.getPlayer();
+        Action action = e.getAction();
+        CSIPlayerData csiPlayerData = (CSIPlayerData) SessionManager.getInstance().getSession(player).getData(CSIPlayerData.identifier);
+        if(csiPlayerData == null)
+            return;
+        ItemStack weaponInHand = player.getItemInHand();
+        CustomItem customItem = CustomItem.findItem(weaponInHand);
+        if(customItem == null)
+            return;
+        if(!(customItem instanceof CustomWeapon))
+            return;
+        CustomWeapon customWeapon = (CustomWeapon) customItem;
+        if(action.equals(Action.PHYSICAL))
+            return;
+        csiPlayerData.startCombo(customWeapon);
+        if(action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
+            csiPlayerData.comboClick(Combo.Click.Right);
+        }
+        else {
+            csiPlayerData.comboClick(Combo.Click.Left);
+        }
     }
 
     @EventHandler
@@ -168,6 +236,7 @@ public class CustomListener implements Listener {
         PlayerSession session = e.getPlayerSession();
         CSIPlayerData csiPlayerData = new CSIPlayerData(e.getPlayer());
         session.addDataToSession(csiPlayerData);
+
         CustomItem itemInHand = CustomItem.findItem(e.getPlayer().getItemInHand());
         if(itemInHand != null) {
             csiPlayerData.equip(itemInHand);

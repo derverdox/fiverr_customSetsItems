@@ -1,6 +1,9 @@
 package de.verdox.csi.model.itemsets.icekingset;
 
 import de.verdox.csi.Core;
+import de.verdox.csi.interfaces.CustomArrowCallback;
+import de.verdox.csi.model.Combo;
+import de.verdox.csi.model.CustomArrow;
 import de.verdox.csi.model.CustomBow;
 import de.verdox.vcore.files.Configuration;
 import de.verdox.vcore.utils.ItemUtil;
@@ -8,14 +11,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class IceKingBow extends CustomBow {
@@ -25,21 +31,31 @@ public class IceKingBow extends CustomBow {
     }
 
     @Override
+    public void onCustomArrowHit(EntityDamageByEntityEvent e) {
+
+    }
+
+    @Override
+    public void onComboTriggered(Player player) {
+
+    }
+
+    @Override
+    public List<Combo.Click> combo() {
+        return null;
+    }
+
+    @Override
     public void onHit(ProjectileHitEvent e) {
-        Projectile projectile = e.getEntity();
-        if(shot.containsKey(projectile)){
-            shot.get(projectile).cancel();
-            shot.remove(projectile);
-        }
     }
 
     @Override
     public void onProjectileLaunch(ProjectileLaunchEvent e) {
         Projectile projectile = e.getEntity();
-        BukkitTask task = Bukkit.getScheduler().runTaskTimerAsynchronously(Core.core,() -> {
-            projectile.getLocation().getWorld().playEffect(projectile.getLocation(), Effect.POTION_BREAK,2,20);
-        },0L,1L);
-        shot.put(projectile,task);
+        if(!(projectile instanceof Arrow))
+            return;
+        Arrow arrow = (Arrow) projectile;
+        CustomArrow.toCustomArrow((Player) e.getEntity().getShooter(), this,0, arrow, Effect.POTION_BREAK, 2, customArrow -> { });
     }
 
     @Override

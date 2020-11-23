@@ -1,7 +1,9 @@
 package de.verdox.csi.model.playersession;
 
 import de.verdox.csi.Core;
+import de.verdox.csi.model.Combo;
 import de.verdox.csi.model.CustomItem;
+import de.verdox.csi.model.CustomWeapon;
 import de.verdox.csi.model.ItemSet;
 import de.verdox.vcore.playersession.PlayerData;
 import org.bukkit.Bukkit;
@@ -14,6 +16,7 @@ public class CSIPlayerData extends PlayerData {
     public static String identifier = "PlayerData_CustomItemSets";
     private Set<ItemSet> equippedSets = new HashSet<>();
     private Set<CustomItem> equippedItems = new HashSet<>();
+    private Combo combo;
     public CSIPlayerData(Player player) {
         super(player);
     }
@@ -24,6 +27,23 @@ public class CSIPlayerData extends PlayerData {
 
     public boolean isSetEquipped(Class c){
         return equippedSets.stream().filter(set -> set.getClass().equals(c)).findAny().isPresent();
+    }
+
+    public void startCombo(CustomWeapon customWeapon) {
+        if (this.combo != null)
+            return;
+        this.combo = new Combo(customWeapon, this, customWeapon.combo());
+    }
+
+    public void comboClick(Combo.Click click){
+        if(this.combo == null)
+            return;
+        this.combo.addClick(click);
+    }
+
+    public void clearCombo(Combo combo){
+        if(combo.equals(this.combo))
+            this.combo = null;
     }
 
     void removeItem(CustomItem item){
@@ -97,6 +117,7 @@ public class CSIPlayerData extends PlayerData {
             // The new Item will be ignored
             if(customItem.equals(newItem))
                 continue;
+
             // If we find a SetItem that is not equipped yet the set is not complete
             if(!customItem.isItemEquipped(player)){
                 return false;

@@ -27,12 +27,12 @@ public class IceKingSet extends ItemSet {
 
     @Override
     public void onEquipFullSet(Player player) {
-
+        System.out.println("You eqipped "+identifier());
     }
 
     @Override
     public void onUnEquipFullSet(Player player) {
-
+        System.out.println("You unequipped "+identifier());
     }
 
     @Override

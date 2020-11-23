@@ -32,11 +32,13 @@ public class SpeedsterSet extends ItemSet {
 
     @Override
     public void onEquipFullSet(Player player) {
+        System.out.println("You eqipped "+identifier());
         player.setWalkSpeed(MinecraftConstants.defaultPlayerWalkSpeed*walkSpeedMultiplier);
     }
 
     @Override
     public void onUnEquipFullSet(Player player) {
+        System.out.println("You unequipped "+identifier());
         player.setWalkSpeed(MinecraftConstants.defaultPlayerWalkSpeed);
     }
 

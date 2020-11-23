@@ -1,25 +1,23 @@
 package de.verdox.csi.model.custommelees;
 
 import de.verdox.csi.Core;
+import de.verdox.csi.interfaces.CustomArrowCallback;
+import de.verdox.csi.model.Combo;
+import de.verdox.csi.model.CustomArrow;
 import de.verdox.csi.model.CustomMelee;
 import de.verdox.vcore.files.Configuration;
 import de.verdox.vcore.utils.ItemUtil;
 import de.verdox.vcore.utils.SecondsConverter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class SwordOfRaijn extends CustomMelee {
 
@@ -37,24 +35,44 @@ public class SwordOfRaijn extends CustomMelee {
     }
 
     @Override
-    public void onRightClick(Player player) {
-        System.out.println("Triggered MiddleClick");
+    public void onComboTriggered(Player player) {
         if(arrowCache.containsKey(player)){
-            player.teleport(arrowCache.get(player).getLocation().add(0,2,0));
+            arrowCache.get(player).remove();
+            CustomArrow customArrow = CustomArrow.findByArrow(arrowCache.get(player));
+            if(customArrow != null)
+                customArrow.stopParticles();
+            arrowCache.remove(player);
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cYou have cancelled the teleportation&7!"));
         }
         else {
             if(cooldownCache.contains(player)){
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cItem is still on cooldown! &8["+ SecondsConverter.convertSeconds(cooldownInSeconds-(System.currentTimeMillis()-lastUse)) +"&8]"));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cItem is still on cooldown! &8["+ (cooldownInSeconds-(TimeUnit.MILLISECONDS.toSeconds((System.currentTimeMillis()-lastUse)))) +"&8]"));
                 return;
             }
-            Arrow arrow = player.getLocation().getWorld().spawnArrow(player.getLocation(),player.getLocation().getDirection(),0.6f,12);
+
+            Arrow arrow = player.getLocation().getWorld().spawnArrow(player.getEyeLocation().add(0,1,0),player.getEyeLocation().getDirection(),1.5f,1);
+            CustomArrow.toCustomArrow(player, null, 5, arrow, Effect.POTION_BREAK, 1, customArrow -> {
+                arrowCache.remove(player);
+                customArrow.getArrow().remove();
+                player.teleport(customArrow.getArrow().getLocation().add(0,1,0));
+            });
+
             arrowCache.put(player,arrow);
             cooldownCache.add(player);
             lastUse = System.currentTimeMillis();
+
             Bukkit.getScheduler().runTaskLaterAsynchronously(Core.core,() -> {
+                arrowCache.remove(player);
                 cooldownCache.remove(player);
             },20L*cooldownInSeconds);
         }
+    }
+
+    private void cancelTeleportation(){}
+
+    @Override
+    public List<Combo.Click> combo() {
+        return Arrays.asList(Combo.Click.Left, Combo.Click.Left, Combo.Click.Right);
     }
 
     @Override
