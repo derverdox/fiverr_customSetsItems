@@ -1,13 +1,11 @@
 package de.verdox.csi.model.playersession;
 
 import de.verdox.csi.Core;
-import de.verdox.csi.model.Combo;
-import de.verdox.csi.model.CustomItem;
-import de.verdox.csi.model.CustomWeapon;
-import de.verdox.csi.model.ItemSet;
+import de.verdox.csi.model.*;
 import de.verdox.vcore.playersession.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +31,21 @@ public class CSIPlayerData extends PlayerData {
         if (this.combo != null)
             return;
         this.combo = new Combo(customWeapon, this, customWeapon.combo());
+    }
+
+    public void checkForItems(){
+        CustomItem itemInHand = CustomItem.findItem(player.getItemInHand());
+        if(itemInHand != null) {
+            equip(itemInHand);
+        }
+        for (ItemStack armorContent : player.getInventory().getArmorContents()) {
+            if(armorContent == null)
+                continue;
+            CustomArmor customArmor = (CustomArmor) CustomItem.findItem(armorContent);
+            if(customArmor == null)
+                continue;
+            equip(customArmor);
+        }
     }
 
     public void comboClick(Combo.Click click){

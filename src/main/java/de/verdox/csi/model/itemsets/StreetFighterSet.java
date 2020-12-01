@@ -1,9 +1,12 @@
 package de.verdox.csi.model.itemsets;
 
+import de.verdox.csi.Core;
 import de.verdox.csi.model.CustomItem;
 import de.verdox.csi.model.ItemSet;
 import de.verdox.vcore.files.Configuration;
 import de.verdox.vcore.utils.MinecraftConstants;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -33,13 +36,13 @@ public class StreetFighterSet extends ItemSet {
 
     @Override
     public void onEquipFullSet(Player player) {
-        System.out.println("You eqipped "+identifier());
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&',"&eYou equipped the &aStreet Fighter Set&7!"));
         player.setWalkSpeed(MinecraftConstants.defaultPlayerWalkSpeed*walkSpeedMultiplier);
     }
 
     @Override
     public void onUnEquipFullSet(Player player) {
-        System.out.println("You unequipped "+identifier());
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&',"&eYou unequipped the &aStreet Fighter Set&7!"));
         player.setWalkSpeed(MinecraftConstants.defaultPlayerWalkSpeed);
     }
 
@@ -50,9 +53,7 @@ public class StreetFighterSet extends ItemSet {
 
     @Override
     public void onDamage(EntityDamageEvent e) {
-        Player player = (Player) e.getEntity();
-        if(player.getItemInHand() == null)
-            e.setDamage(e.getFinalDamage()*punchMultiplier);
+        e.setDamage(e.getFinalDamage()*damageReceiveMultiplier);
     }
 
     @Override
@@ -62,7 +63,12 @@ public class StreetFighterSet extends ItemSet {
 
     @Override
     public void onAttack(EntityDamageByEntityEvent e) {
-        e.setDamage(e.getFinalDamage()*damageReceiveMultiplier);
+        Core.debug("Attack "+identifier()+" ");
+        Player player = (Player) e.getDamager();
+        if(player.getItemInHand() == null || player.getItemInHand().getType().equals(Material.AIR)){
+            e.setDamage(e.getFinalDamage()*punchMultiplier);
+            Core.debug("Damage with Hand: "+e.getFinalDamage());
+        }
     }
 
     @Override

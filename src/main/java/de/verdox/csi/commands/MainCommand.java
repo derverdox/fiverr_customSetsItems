@@ -17,6 +17,11 @@ public class MainCommand implements TabExecutor {
             return false;
         Player player = (Player) sender;
 
+        if(!player.hasPermission("csi.giveItem")){
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cNo permission&7!"));
+            return false;
+        }
+
         if(args.length == 2){
             if(args[0].equalsIgnoreCase("give")){
                 String customItemName = args[1];

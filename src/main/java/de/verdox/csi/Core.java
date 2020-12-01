@@ -37,6 +37,7 @@ public class Core extends JavaPlugin {
 
     public static VCore vcore;
     public static Core core;
+    public static boolean debugMode = false;
 
     public MainConfig mainConfig;
 
@@ -108,5 +109,10 @@ public class Core extends JavaPlugin {
         //
         SwordOfRaijn swordOfRaijn = new SwordOfRaijn(mainConfig);
         ThrowingAxe throwingAxe = new ThrowingAxe(mainConfig);
+    }
+
+    public static void debug(String debug){
+        if(debugMode == true)
+            System.out.println(debug);
     }
 }

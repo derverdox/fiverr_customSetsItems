@@ -1,13 +1,11 @@
 package de.verdox.csi.listener;
 
-import de.verdox.csi.Core;
 import de.verdox.csi.model.*;
 import de.verdox.csi.model.playersession.CSIPlayerData;
-import de.verdox.vcore.events.PlayerSessionCreateEvent;
 import de.verdox.vcore.events.armorequipevent.ArmorEquipEvent;
 import de.verdox.vcore.playersession.PlayerSession;
 import de.verdox.vcore.playersession.SessionManager;
-import org.bukkit.Effect;
+import de.verdox.vcore.playersession.events.PlayerSessionCreateEvent;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -232,23 +230,21 @@ public class CustomListener implements Listener {
     }
 
     @EventHandler
-    public void onSessionCreate(PlayerSessionCreateEvent e){
-        PlayerSession session = e.getPlayerSession();
-        CSIPlayerData csiPlayerData = new CSIPlayerData(e.getPlayer());
-        session.addDataToSession(csiPlayerData);
+    public void onRespawn(PlayerGameModeChangeEvent e){
+        PlayerSession session = SessionManager.getInstance().getSession(e.getPlayer());
+        CSIPlayerData csiPlayerData = (CSIPlayerData) session.getData(CSIPlayerData.identifier);
+        csiPlayerData.checkForItems();
+    }
 
-        CustomItem itemInHand = CustomItem.findItem(e.getPlayer().getItemInHand());
-        if(itemInHand != null) {
-            csiPlayerData.equip(itemInHand);
+    @EventHandler
+    public void onSessionCreate(PlayerSessionCreateEvent e){
+        PlayerSession session = SessionManager.getInstance().getSession(e.getPlayer());
+        CSIPlayerData csiPlayerData = (CSIPlayerData) session.getData(CSIPlayerData.identifier);
+        if(csiPlayerData == null){
+            csiPlayerData = new CSIPlayerData(e.getPlayer());
+            session.addDataToSession(csiPlayerData);
         }
-        for (ItemStack armorContent : session.getPlayer().getInventory().getArmorContents()) {
-            if(armorContent == null)
-                continue;
-            CustomArmor customArmor = (CustomArmor) CustomItem.findItem(armorContent);
-            if(customArmor == null)
-                continue;
-            csiPlayerData.equip(customArmor);
-        }
+        csiPlayerData.checkForItems();
     }
 
     @EventHandler

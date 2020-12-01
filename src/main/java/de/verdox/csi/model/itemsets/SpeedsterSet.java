@@ -4,6 +4,7 @@ import de.verdox.csi.model.CustomItem;
 import de.verdox.csi.model.ItemSet;
 import de.verdox.vcore.files.Configuration;
 import de.verdox.vcore.utils.MinecraftConstants;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -32,13 +33,13 @@ public class SpeedsterSet extends ItemSet {
 
     @Override
     public void onEquipFullSet(Player player) {
-        System.out.println("You eqipped "+identifier());
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&',"&eYou equipped the &aSpeedster Set&7!"));
         player.setWalkSpeed(MinecraftConstants.defaultPlayerWalkSpeed*walkSpeedMultiplier);
     }
 
     @Override
     public void onUnEquipFullSet(Player player) {
-        System.out.println("You unequipped "+identifier());
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&',"&eYou equipped the &aSpeedster Set&7!"));
         player.setWalkSpeed(MinecraftConstants.defaultPlayerWalkSpeed);
     }
 
